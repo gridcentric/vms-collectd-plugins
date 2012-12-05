@@ -19,13 +19,13 @@ to the collectd module path for some additional statistics.
 Finally, edit the file `/etc/collectd/collectd.conf` to load the module. In a
 minimal configuration, this would look like:
 
-  LoadPlugin python
-
-  <Plugin python>
-    ModulePath "/usr/lib/collectd/"
-    Import "vms"
-    Import "vmsfs"
-  </Plugin>
+    LoadPlugin python
+  
+    <Plugin python>
+      ModulePath "/usr/lib/collectd/"
+      Import "vms"
+      Import "vmsfs"
+    </Plugin>
 
 Usage with Graphite
 ===================
@@ -34,22 +34,22 @@ You may have other python modules loaded or different ways of sending data
 using `collectd`.  If you are using `collectd` with graphite, the relevant
 portion of your `/etc/collectd/collectd.conf` file would look like:
 
-  <LoadPlugin python>
-    Globals true
-  </LoadPlugin>
+    <LoadPlugin python>
+      Globals true
+    </LoadPlugin>
 
-  <Plugin python>
-    ModulePath "/usr/lib/collectd/"
+    <Plugin python>
+      ModulePath "/usr/lib/collectd/"
 
-    Import "vms"
-    Import "vmsfs"
-    Import "carbon_writer"
+      Import "vms"
+      Import "vmsfs"
+      Import "carbon_writer"
 
-    <Module "carbon_writer">
+      <Module "carbon_writer">
         LineReceiverHost "my-stats-server"
         LineReceiverPort 2003
         DifferentiateCountersOverTime true
         LowercaseMetricNames true
         TypesDB "/usr/share/collectd/types.db"
-    </Module>
-  </Plugin>
+      </Module>
+    </Plugin>
