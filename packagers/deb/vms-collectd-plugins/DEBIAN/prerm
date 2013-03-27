@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+function remove_plugin {
+    COLLECTD_CONF=$1
+    PLUGIN_CONF=$2
+
+    if [ -f $COLLECTD_CONF ]; then
+        cat $COLLECTD_CONF | \
+            grep -v "Include \"$PLUGIN_CONF\"" > $COLLECTD_CONF.new && \
+            mv $COLLECTD_CONF.new $COLLECTD_CONF || \
+            rm -f $COLLECTD_CONF.new
+
+        # Restart collectd if running.
+        if service collectd status | grep 'running'; then
+            service collectd restart
+        fi
+    fi
+}
+
+case $1 in
+    remove)
+        remove_plugin \
+            /etc/collectd/collectd.conf \
+            /etc/collectd/vms-collectd-plugins.conf
+        ;;
+esac

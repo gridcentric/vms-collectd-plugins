@@ -1,0 +1,7 @@
+Package: vms-collectd-plugins
+Section: extra
+Version: VERSION
+Architecture: all
+Depends: collectd
+Maintainer: Gridcentric Inc. <support@gridcentric.com>
+Description: Collectd plugins for Gridcentric VMS.
