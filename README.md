@@ -9,9 +9,9 @@ technology is performing using a variety of graphing and analysis tools.
 Installation
 ============
 
-Copy the file `src/vms.py` to the collectd module `/usr/lib/collectd` path on
-your system. Normally this path is `/usr/lib/collectd` but it may be different
-on your system.
+Copy the files `src/vmsdoms.py` and `src/vmsfs.py` to the collectd module
+`/usr/lib/collectd` path on your system. Normally this path is
+`/usr/lib/collectd` but it may be different on your system.
 
 If you are using VMS with the KVM hypervisor, you may also copy `src/vmsfs.py`
 to the collectd module path for some additional statistics.
@@ -19,13 +19,18 @@ to the collectd module path for some additional statistics.
 Finally, edit the file `/etc/collectd/collectd.conf` to load the module. In a
 minimal configuration, this would look like:
 
-    LoadPlugin python
-  
+    <LoadPlugin python>
+      Globals true
+    </LoadPlugin>
     <Plugin python>
       ModulePath "/usr/lib/collectd/"
-      Import "vms"
+      Import "vmsdoms"
       Import "vmsfs"
     </Plugin>
+
+To register statistics for individual VMs, you will probably also want:
+
+    LoadPlugin libvirt
 
 Usage with Graphite
 ===================
@@ -40,8 +45,7 @@ portion of your `/etc/collectd/collectd.conf` file would look like:
 
     <Plugin python>
       ModulePath "/usr/lib/collectd/"
-
-      Import "vms"
+      Import "vmsdoms"
       Import "vmsfs"
       Import "carbon_writer"
 
