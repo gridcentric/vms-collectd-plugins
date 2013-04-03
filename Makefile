@@ -45,6 +45,13 @@ install-rpm:
 
 rpm: install-rpm
 	rm -rf rpmbuild
+	$(INSTALL_DIR) rpmbuild/BUILD
+	$(INSTALL_DIR) rpmbuild/BUILDROOT
+	$(INSTALL_DIR) rpmbuild/RPMS/noarch
+	$(INSTALL_DIR) rpmbuild/SOURCES
+	$(INSTALL_DIR) rpmbuild/SPECS
+	$(INSTALL_DIR) rpmbuild/SRPMS
+
 	rpmbuild -bb --buildroot $(CURDIR)/rpmbuild/BUILDROOT \
           --define="%_topdir $(CURDIR)/rpmbuild" --define="%version $(VERSION).$(RELEASE)" \
 	  --define="%release $(RELEASE)" packagers/rpm/vms-collectd-plugins.spec
