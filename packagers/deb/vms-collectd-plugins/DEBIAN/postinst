@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+function add_plugin {
+    COLLECTD_CONF=$1
+    PLUGIN_CONF=$2
+
+    if [ -f $COLLECTD_CONF ]; then
+        if ! grep --quiet "Include \"$PLUGIN_CONF\"" $COLLECTD_CONF; then
+            echo "Include \"$PLUGIN_CONF\"" >> $COLLECTD_CONF
+        fi
+
+        # Restart collectd if running.
+        if service collectd status | grep 'running'; then
+            service collectd restart
+        fi
+    fi
+}
+
+case $1 in
+    configure)
+        add_plugin \
+            /etc/collectd/collectd.conf \
+            /etc/collectd/vms-collectd-plugins.conf
+        ;;
+esac
