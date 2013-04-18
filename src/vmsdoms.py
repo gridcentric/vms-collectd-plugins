@@ -1,4 +1,6 @@
+import os
 import vms
+import pickle
 import collectd
 
 # This is required to fix insanity (IOERROR no child processes on file close?)
@@ -26,9 +28,10 @@ def vms_dispatch_one(name, value, type, host=None):
         val.host = host
     val.dispatch()
 
-def vms_collectd_read():
+def do_collectd_read():
     vms.virt.init()
     hypervisor = vms.virt.AUTO.Hypervisor()
+    results = []
 
     # Get list of domains and iterate.
     domains = hypervisor.domain_list()
@@ -59,7 +62,8 @@ def vms_collectd_read():
         vms_domains.append((dom, ctrl))
         count += 1
 
-    vms_dispatch_one('domains', count, type='absolute')
+    # Add the number of domains.
+    results.append({"name" : "domains", "value" : count, "type" : "absolute"})
 
     # For each stat,
     for stat in PLUGIN_STATS:
@@ -77,12 +81,40 @@ def vms_collectd_read():
                 continue
 
             # Dispatch.
-            vms_dispatch_one(stat, value, type=type, host=dom.name())
+            results.append({"name" : stat, "value" : value, "type" : type, "host" : dom.name()})
 
             # Add to total.
             total = total + value
 
         # Dispatch total value.
-        vms_dispatch_one(stat, total, type=type)
+        results.append({ "name" : stat, "value" : total, "type" : type })
+
+    # We're done.
+    return results
+
+def vms_collectd_read():
+    r, w = os.pipe()
+    pid = os.fork()
+    if pid == 0:
+        os.close(r)
+        w = os.fdopen(w, 'w')
+        results = do_collectd_read()
+        pickle.dump(results, w)
+        w.close()
+        # We do a hard exit here because otherwise,
+        # we will simply exit back into the main collectd
+        # thread -- which we certainly don't want.
+        os._exit(0)
+    else:
+        # We don't do a waitpid here because collectd
+        # seems to frequently harvest child processes.
+        # pid, status = os.waitpid(pid, 0)
+        os.close(w)
+        r = os.fdopen(r, 'r')
+        results = pickle.load(r)
+        r.close()
+
+    for result in results:
+        vms_dispatch_one(**result)
 
 collectd.register_read(vms_collectd_read)
