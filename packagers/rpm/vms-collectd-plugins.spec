@@ -45,6 +45,10 @@ if [ "$1" == "0" ]; then
     if service collectd status | grep 'running'; then
         service collectd restart
     fi
+
+    # Cleanup generate .pyc files.
+    rm -f /var/lib/collectd/vmsfs.pyc
+    rm -f /var/lib/collectd/vmsdoms.pyc
 fi
 
 %changelog
