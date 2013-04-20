@@ -24,5 +24,9 @@ case $1 in
         remove_plugin \
             /etc/collectd/collectd.conf \
             /etc/collectd/vms-collectd-plugins.conf
+
+        # Cleanup generated .pyc files.
+        rm -f /usr/lib/collectd/vmsfs.pyc
+        rm -f /usr/lib/collectd/vmsdoms.pyc
         ;;
 esac
