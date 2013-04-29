@@ -13,7 +13,7 @@ PLUGIN_STATS = {
     'nominal' : ('pages', 'memory', 4096.0),
     'current' : ('memory.current', 'memory', 4096.0),
     'clean'   : ('memory.clean', 'memory', 4096.0),
-    'dirty'   : ('dirty', 'memory', 4096.0),
+    'dirty'   : ('memory.dirty', 'memory', 4096.0),
     'limit'   : ('memory.limit', 'memory', 4096.0),
     'target'  : ('memory.target', 'memory', 4096.0),
     'shared'  : ('memory.shared', 'memory', 4096.0),
