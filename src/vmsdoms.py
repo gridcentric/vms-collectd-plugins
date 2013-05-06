@@ -1,5 +1,4 @@
 import os
-import vms
 import pickle
 import collectd
 
@@ -29,6 +28,7 @@ def vms_dispatch_one(name, value, type, host=None):
     val.dispatch()
 
 def do_collectd_read():
+    import vms
     vms.virt.init()
     hypervisor = vms.virt.AUTO.Hypervisor()
     results = []
@@ -96,15 +96,17 @@ def vms_collectd_read():
     r, w = os.pipe()
     pid = os.fork()
     if pid == 0:
-        os.close(r)
-        w = os.fdopen(w, 'w')
-        results = do_collectd_read()
-        pickle.dump(results, w)
-        w.close()
-        # We do a hard exit here because otherwise,
-        # we will simply exit back into the main collectd
-        # thread -- which we certainly don't want.
-        os._exit(0)
+        try:
+            os.close(r)
+            w = os.fdopen(w, 'w')
+            results = do_collectd_read()
+            pickle.dump(results, w)
+            w.close()
+        finally:
+            # We do a hard exit here because otherwise,
+            # we will simply exit back into the main collectd
+            # thread -- which we certainly don't want.
+            os._exit(0)
     else:
         # We don't do a waitpid here because collectd
         # seems to frequently harvest child processes.
